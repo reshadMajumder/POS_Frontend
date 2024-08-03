@@ -10,7 +10,7 @@ export const createProduct = (productData) => axios.post(`${API_URL}products/`, 
 
 
 
-export const searchProducts = (query) => axios.get(`${API_URL}search-products/`, { params: { query } });
+export const searchProducts = (query) => axios.get(`${API_URL}stocks/search/`, { params: { query } });
 
 export const createProductStock = (data) => axios.post(`${API_URL}stocks/`, data);
 export const createStock = (data) => axios.post(`${API_URL}stocks/`, data);
@@ -24,6 +24,8 @@ export const fetchStocks = () => {
 export const createBill = (billData) => {
     return axios.post(`${API_URL}bills/`, billData);
 };
+
+
 
 // export const ProductStock = () => axios.get(`${API_URL}supplier-products/`);
 // export const AddToStock = (data) => axios.post(`${API_URL}supplier-products/`, data);

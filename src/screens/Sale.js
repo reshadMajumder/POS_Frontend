@@ -16,29 +16,61 @@ function Sale() {
     useEffect(() => {
         if (query) {
             searchProducts(query)
-                .then((response) => setSuggestions(response.data))
+                .then((response) => {
+                    const filteredSuggestions = response.data.filter(
+                        (stock) => !selectedProducts.some((product) => product.id === stock.product.id)
+                    );
+                    setSuggestions(filteredSuggestions);
+                })
                 .catch((error) => console.error('Error fetching suggestions:', error));
         } else {
             setSuggestions([]);
         }
-    }, [query]);
+    }, [query, selectedProducts]);
 
-    const handleAddProduct = (product) => {
-        setSelectedProducts([...selectedProducts, { ...product, quantity }]);
+    const handleAddProduct = (stock) => {
+        if (quantity > stock.quantity) {
+            alert('Quantity exceeds available stock.');
+            return;
+        }
+        
+        const updatedProducts = [...selectedProducts, { ...stock.product, quantity: quantity, stock_id: stock.id, supplier: stock.supplier.name, available_stock: stock.quantity }];
+        setSelectedProducts(updatedProducts);
         setQuery('');
         setQuantity(1);
         setSuggestions([]);
+        console.log('Products in the sale table:', updatedProducts);
     };
 
     const handleRemoveProduct = (index) => {
-        setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
+        const updatedProducts = selectedProducts.filter((_, i) => i !== index);
+        setSelectedProducts(updatedProducts);
+        console.log('Products in the sale table after removal:', updatedProducts);
+    };
+
+    const handleQuantityChange = (index, newQuantity) => {
+        const product = selectedProducts[index];
+        if (newQuantity > product.available_stock) {
+            alert('Quantity exceeds available stock.');
+            return;
+        }
+        
+        const updatedProducts = [...selectedProducts];
+        updatedProducts[index].quantity = newQuantity;
+        setSelectedProducts(updatedProducts);
+        console.log('Products in the sale table after quantity change:', updatedProducts);
     };
 
     const handleConfirm = () => {
+        if (!customerPhone || selectedProducts.length === 0) {
+            alert('Please provide customer phone number and add at least one product.');
+            return;
+        }
+
         const billData = {
-            customer: { phone_number: customerPhone },
+            customer_phone: customerPhone,
             total_amount: selectedProducts.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0),
-            sales: selectedProducts.map(product => ({
+            items: selectedProducts.map(product => ({
                 product: product.id,
                 quantity: product.quantity,
                 selling_price_per_unit: product.selling_price_per_unit
@@ -50,6 +82,7 @@ function Sale() {
                 console.log('Bill created successfully:', response.data);
                 setSelectedProducts([]);
                 setCustomerPhone('');
+                console.log('Products in the sale table after bill creation: []');
             })
             .catch((error) => console.error('Error creating bill:', error));
     };
@@ -61,17 +94,17 @@ function Sale() {
                 <div className="main-header">
                     <Navbar />
                 </div>
-                <div className="container-fluid" style={{ height: '100vh', overflow: 'auto' }}>
+                <div className="container-fluid pt-3" style={{ height: '100vh', overflow: 'auto' }}>
                     <div className="page-inner">
                         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                             <div>
                                 <h3 className="fw-bold">Sell items</h3>
-                            </div>
+                                                           </div>
                         </div>
                         <div className="row">
                             <div className="col-sm-6 col-md-9">
                                 <div className="card">
-                                    <div className="nav-search d-lg-flex pt-1">
+                                    <div className="nav-search d-lg-flex pt-1 m-2">
                                         <div className="input-group">
                                             <div className="input-group-prepend">
                                                 <button type="submit" className="btn btn-search pe-1">
@@ -99,9 +132,15 @@ function Sale() {
                                     {suggestions.length > 0 && (
                                         <div className="suggestions">
                                             <ul>
-                                                {suggestions.map((product) => (
-                                                    <li key={product.id} onClick={() => handleAddProduct(product)}>
-                                                        {product.name}
+                                                {Object.values(suggestions.reduce((acc, stock) => {
+                                                    if (!acc[stock.product.id]) {
+                                                        acc[stock.product.id] = { ...stock, quantity: 0 }
+                                                    }
+                                                    acc[stock.product.id].quantity += stock.quantity
+                                                    return acc
+                                                }, {})).map((stock) => (
+                                                    <li key={stock.product.id} onClick={() => handleAddProduct(stock)}>
+                                                        {stock.product.name} -- {"Qty :" + stock.quantity} 
                                                     </li>
                                                 ))}
                                             </ul>
@@ -133,7 +172,16 @@ function Sale() {
                                                             <td>{product.id}</td>
                                                             <td>{product.name}</td>
                                                             <td>{product.unit}</td>
-                                                            <td>{product.quantity}</td>
+                                                            <td>
+                                                                <Form.Control
+                                                                    type="number"
+                                                                    min="1"
+                                                                    max={product.available_stock}
+                                                                    value={product.quantity}
+                                                                    onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
+                                                                    style={{ width: '80px' }}
+                                                                />
+                                                            </td>
                                                             <td>{product.selling_price_per_unit}</td>
                                                             <td>{(product.quantity * product.selling_price_per_unit).toFixed(2)}</td>
                                                             <td>
@@ -180,6 +228,10 @@ function Sale() {
                                                         <td>0.00</td>
                                                     </tr>
                                                     <tr>
+                                                        <td>Adjusted amount</td>
+                                                        <td>0.00</td>
+                                                    </tr>
+                                                    <tr>
                                                         <td>Subtotal</td>
                                                         <td>{selectedProducts.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0).toFixed(2)}</td>
                                                     </tr>
@@ -195,7 +247,10 @@ function Sale() {
                                             />
                                         </div>
                                         <div className="d-flex justify-content-between">
-                                            <Button variant="primary" className="btn-border btn-round" onClick={() => setSelectedProducts([])}>
+                                            <Button variant="primary" className="btn-border btn-round" onClick={() => {
+                                                setSelectedProducts([]);
+                                                console.log('Products in the sale table after clearing: []');
+                                            }}>
                                                 Clear
                                             </Button>
                                             <Button variant="primary" className="btn-border btn-round" onClick={handleConfirm}>
