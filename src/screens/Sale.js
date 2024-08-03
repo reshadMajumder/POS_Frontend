@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { searchProducts, createBill } from '../services/Api';
 import { Table, Button, Form } from 'react-bootstrap';
+import TotalTable from '../components/TotalTable'; // Import the TotalSummary component
 
 function Sale() {
     const [query, setQuery] = useState('');
@@ -12,13 +13,16 @@ function Sale() {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [customerPhone, setCustomerPhone] = useState('');
+    const [vat, setVat] = useState(15); // Default VAT set to 15%
+    const [discount, setDiscount] = useState(0);
 
     useEffect(() => {
         if (query) {
             searchProducts(query)
                 .then((response) => {
-                    const filteredSuggestions = response.data.filter(
-                        (stock) => !selectedProducts.some((product) => product.id === stock.product.id)
+                    // Filter out already added products
+                    const filteredSuggestions = response.data.filter(stock => 
+                        !selectedProducts.some(selected => selected.id === stock.product.id)
                     );
                     setSuggestions(filteredSuggestions);
                 })
@@ -29,12 +33,16 @@ function Sale() {
     }, [query, selectedProducts]);
 
     const handleAddProduct = (stock) => {
-        if (quantity > stock.quantity) {
-            alert('Quantity exceeds available stock.');
+        const existingProduct = selectedProducts.find(p => p.id === stock.product.id);
+        const totalQuantity = existingProduct ? existingProduct.quantity + quantity : quantity;
+
+        // Check if the requested quantity exceeds available stock
+        if (totalQuantity > stock.quantity) {
+            alert(`Cannot add more than ${stock.quantity} units of ${stock.product.name}.`);
             return;
         }
-        
-        const updatedProducts = [...selectedProducts, { ...stock.product, quantity: quantity, stock_id: stock.id, supplier: stock.supplier.name, available_stock: stock.quantity }];
+
+        const updatedProducts = [...selectedProducts, { ...stock.product, quantity: quantity, stock_id: stock.id, supplier: stock.supplier.name, maxQuantity: stock.quantity }];
         setSelectedProducts(updatedProducts);
         setQuery('');
         setQuantity(1);
@@ -49,14 +57,15 @@ function Sale() {
     };
 
     const handleQuantityChange = (index, newQuantity) => {
-        const product = selectedProducts[index];
-        if (newQuantity > product.available_stock) {
-            alert('Quantity exceeds available stock.');
+        const updatedProducts = [...selectedProducts];
+        const product = updatedProducts[index];
+        
+        if (newQuantity > product.maxQuantity) {
+            alert(`Cannot add more than ${product.maxQuantity} units of ${product.name}.`);
             return;
         }
         
-        const updatedProducts = [...selectedProducts];
-        updatedProducts[index].quantity = newQuantity;
+        product.quantity = newQuantity;
         setSelectedProducts(updatedProducts);
         console.log('Products in the sale table after quantity change:', updatedProducts);
     };
@@ -82,6 +91,8 @@ function Sale() {
                 console.log('Bill created successfully:', response.data);
                 setSelectedProducts([]);
                 setCustomerPhone('');
+                setDiscount(0);
+                
                 console.log('Products in the sale table after bill creation: []');
             })
             .catch((error) => console.error('Error creating bill:', error));
@@ -99,7 +110,7 @@ function Sale() {
                         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                             <div>
                                 <h3 className="fw-bold">Sell items</h3>
-                                                           </div>
+                            </div>
                         </div>
                         <div className="row">
                             <div className="col-sm-6 col-md-9">
@@ -125,7 +136,7 @@ function Sale() {
                                                 min="1"
                                                 placeholder="Quantity"
                                                 value={quantity}
-                                                onChange={(e) => setQuantity(e.target.value)}
+                                                onChange={(e) => setQuantity(parseInt(e.target.value))}
                                             />
                                         </div>
                                     </div>
@@ -140,7 +151,7 @@ function Sale() {
                                                     return acc
                                                 }, {})).map((stock) => (
                                                     <li key={stock.product.id} onClick={() => handleAddProduct(stock)}>
-                                                        {stock.product.name} -- {"Qty :" + stock.quantity} 
+                                                        {stock.product.name} -- {"Qty :" + stock.quantity}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -176,12 +187,13 @@ function Sale() {
                                                                 <Form.Control
                                                                     type="number"
                                                                     min="1"
-                                                                    max={product.available_stock}
+                                                                    max={product.maxQuantity}
                                                                     value={product.quantity}
                                                                     onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
                                                                     style={{ width: '80px' }}
                                                                 />
                                                             </td>
+                                                            
                                                             <td>{product.selling_price_per_unit}</td>
                                                             <td>{(product.quantity * product.selling_price_per_unit).toFixed(2)}</td>
                                                             <td>
@@ -201,63 +213,31 @@ function Sale() {
                             </div>
 
                             <div className="col-sm-6 col-md-3">
-                                <div className="card">
-                                    <div className="card-header">
-                                        <div className="card-title">Total</div>
-                                    </div>
-                                    <div className="card-body">
-                                        <div className="table-responsive">
-                                            <Table>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Instance</th>
-                                                        <th>Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Total</td>
-                                                        <td>{selectedProducts.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0).toFixed(2)}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>VAT</td>
-                                                        <td>0.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Discount</td>
-                                                        <td>0.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Adjusted amount</td>
-                                                        <td>0.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Subtotal</td>
-                                                        <td>{selectedProducts.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0).toFixed(2)}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </Table>
-                                        </div>
-                                        <div className="form-group">
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Customer Phone Number"
-                                                value={customerPhone}
-                                                onChange={(e) => setCustomerPhone(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="d-flex justify-content-between">
-                                            <Button variant="primary" className="btn-border btn-round" onClick={() => {
-                                                setSelectedProducts([]);
-                                                console.log('Products in the sale table after clearing: []');
-                                            }}>
-                                                Clear
-                                            </Button>
-                                            <Button variant="primary" className="btn-border btn-round" onClick={handleConfirm}>
-                                                Confirm
-                                            </Button>
-                                        </div>
-                                    </div>
+                                <TotalTable 
+                                    products={selectedProducts} 
+                                    vat={vat} 
+                                    discount={discount} 
+                                    setVat={setVat} 
+                                    setDiscount={setDiscount} 
+                                />
+                                <div className="form-group">
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Customer Phone Number"
+                                        value={customerPhone}
+                                        onChange={(e) => setCustomerPhone(e.target.value)}
+                                    />
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <Button variant="primary" className="btn-border btn-round" onClick={() => {
+                                        setSelectedProducts([]);
+                                        console.log('Products in the sale table after clearing: []');
+                                    }}>
+                                        Clear
+                                    </Button>
+                                    <Button variant="primary" className="btn-border btn-round" onClick={handleConfirm}>
+                                        Confirm
+                                    </Button>
                                 </div>
                             </div>
                         </div>
