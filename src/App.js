@@ -11,6 +11,7 @@ import AddProducts from './screens/AddProducts';
 import Suppliers from './screens/Suppliers';
 import Products from './screens/Products';
 import ProductStock from './screens/ProductStock';
+import AddproductsT from './screens/AddproductsT';
 
 
 function App() {
@@ -44,7 +45,7 @@ function App() {
         />
         <Route
             path="/AddToStock"
-            element={isAuthenticated ? <AddProducts/> : <Navigate to="/login" />}
+            element={isAuthenticated ? <AddproductsT/> : <Navigate to="/login" />}
         />
     </Routes>
 </Router>

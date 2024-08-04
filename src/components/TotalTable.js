@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Form, Dropdown } from 'react-bootstrap';
 
-function TotalTable({ products, vat, discount, setVat, setDiscount }) {
+function TotalTable({ products, vat, discount, setVat, setDiscount ,totalPaid,setTotalPaid}) {
     const subtotal = products.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0);
     const vatAmount = (subtotal * vat) / 100;
     const totalAmount = subtotal + vatAmount - discount;
@@ -45,13 +45,7 @@ function TotalTable({ products, vat, discount, setVat, setDiscount }) {
                 </Dropdown>
             </div>
             <div className="card-body">
-                <Table>
-                    <thead>
-                        <tr>
-                            <th>Instance</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
+                <Table size="sm" className="table-condensed">
                     <tbody>
                         <tr>
                             <td>Subtotal</td>
@@ -69,13 +63,36 @@ function TotalTable({ products, vat, discount, setVat, setDiscount }) {
                             <td>Adjustment</td>
                             <td>{adjustment.toFixed(2)}</td>
                         </tr>
-                        <tr >
-                            <td >Total Amount</td>
-                            <td>{adjustedAmount.toFixed(2)}</td>
+                        <tr>
+                            <td style={{ fontWeight: 'bold', color: 'green' }}>Total</td>
+                            <td style={{ fontWeight: 'bold', color: 'green' }}>{adjustedAmount.toFixed(2)}</td>
                         </tr>
-                        
                     </tbody>
                 </Table>
+                <Table size="sm" className="mt-3" style={{ width: '80%' }}>
+                  
+                    <tbody>
+                        <tr>
+                            <td>
+                                <Form.Control as="select" size="sm" style={{ fontSize: '0.8em', width: '50px' }} placeholder="Payment">
+                                    <option>Cash</option>
+                                    <option>Card</option>
+                                    <option>Mobile Payment</option>
+                                </Form.Control>
+                            </td>
+                            <td>
+                                    <Form.Control
+                                        type="number"
+                                        placeholder="Total Paid"
+                                        value={totalPaid}
+                                        onChange={(e) => setTotalPaid(parseFloat(e.target.value))}
+                                        style={{ fontSize: '0.8em', padding: '1px', width: '60px' }}
+                                    />
+                            </td>
+                        </tr>
+                    </tbody>
+                </Table>
+               
             </div>
         </div>
     );

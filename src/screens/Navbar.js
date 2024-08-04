@@ -15,26 +15,26 @@ function Navbar() {
 
 
     return (
-        <div>
+        <div style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
             <div>
-                <div class="main-header-logo">
+                <div className="main-header-logo">
                     {/* <!-- Logo Header --> */}
-                    <div class="logo-header" data-background-color="dark">
-                        <a href="index.html" class="logo">
-                            <img src="assets/img/kaiadmin/logo_light.png" alt="navbar brand" class="navbar-brand"
+                    <div className="logo-header" data-background-color="dark">
+                        <a href="index.html" className="logo">
+                            <img src="assets/img/kaiadmin/logo_light.png" alt="navbar brand" className="navbar-brand"
                                 height="20" />
                         </a>
-                        <div class="nav-toggle">
+                        <div className="nav-toggle">
 
-                            <button class="btn btn-toggle toggle-sidebar">
-                                <i class="gg-menu-right"></i>
+                            <button className="btn btn-toggle toggle-sidebar">
+                                <i className="gg-menu-right"></i>
                             </button>
-                            <button class="btn btn-toggle sidenav-toggler">
-                                <i class="gg-menu-left"></i>
+                            <button className="btn btn-toggle sidenav-toggler">
+                                <i className="gg-menu-left"></i>
                             </button>
                         </div>
-                        <button class="topbar-toggler more">
-                            <i class="gg-more-vertical-alt"></i>
+                        <button className="topbar-toggler more">
+                            <i className="gg-more-vertical-alt"></i>
                         </button>
                     </div>
                     {/* <!-- End Logo Header --> */}
