@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { searchProducts, createBill } from '../services/Api';
 import { Table, Button, Form } from 'react-bootstrap';
-import TotalTable from '../components/TotalTable'; // Import the TotalSummary component
+import TotalTable from '../components/TotalTable';
 
 function Sale() {
     const [query, setQuery] = useState('');
@@ -13,14 +13,22 @@ function Sale() {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const [customerPhone, setCustomerPhone] = useState('');
-    const [vat, setVat] = useState(15); // Default VAT set to 15%
+    const [vat, setVat] = useState(15);
     const [discount, setDiscount] = useState(0);
+
+    useEffect(() => {
+        const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+        setSelectedProducts(savedProducts);
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+    }, [selectedProducts]);
 
     useEffect(() => {
         if (query) {
             searchProducts(query)
                 .then((response) => {
-                    // Filter out already added products
                     const filteredSuggestions = response.data.filter(stock => 
                         !selectedProducts.some(selected => selected.id === stock.product.id)
                     );
@@ -36,13 +44,12 @@ function Sale() {
         const existingProduct = selectedProducts.find(p => p.id === stock.product.id);
         const totalQuantity = existingProduct ? existingProduct.quantity + quantity : quantity;
 
-        // Check if the requested quantity exceeds available stock
         if (totalQuantity > stock.quantity) {
             alert(`Cannot add more than ${stock.quantity} units of ${stock.product.name}.`);
             return;
         }
 
-        const updatedProducts = [...selectedProducts, { ...stock.product, quantity: quantity, stock_id: stock.id, supplier: stock.supplier.name, maxQuantity: stock.quantity }];
+        const updatedProducts = [...selectedProducts, { ...stock.product, quantity: quantity, stock_id: stock.id, supplier: stock.supplier.name, maxQuantity: stock.quantity, supplier_price_per_unit: stock.supplier_price_per_unit }];
         setSelectedProducts(updatedProducts);
         setQuery('');
         setQuantity(1);
@@ -75,27 +82,44 @@ function Sale() {
             alert('Please provide customer phone number and add at least one product.');
             return;
         }
-
+    
+        const totalAmount = selectedProducts.reduce((acc, product) => acc + product.quantity * parseFloat(product.selling_price_per_unit), 0);
+        const totalCost = selectedProducts.reduce((acc, product) => acc + product.quantity * parseFloat(product.supplier_price_per_unit), 0);
+        const vatAmount = (vat / 100) * totalAmount;
+        const totalProfitOrLoss = totalAmount - totalCost - discount;
+    
         const billData = {
             customer_phone: customerPhone,
-            total_amount: selectedProducts.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0),
+            total_amount: totalAmount.toFixed(2),
+            vat_amount: vatAmount.toFixed(2),
+            discount: discount.toFixed(2),
+            total_cost: Number(totalCost.toFixed(2)),
+            total_profit_or_loss: Number(totalProfitOrLoss.toFixed(2)),
             items: selectedProducts.map(product => ({
                 product: product.id,
                 quantity: product.quantity,
                 selling_price_per_unit: product.selling_price_per_unit
-            }))
+            })),
+            created_at: new Date().toISOString().split('T')[0]
         };
-
+    
         createBill(billData)
             .then((response) => {
                 console.log('Bill created successfully:', response.data);
                 setSelectedProducts([]);
                 setCustomerPhone('');
                 setDiscount(0);
-                
+                setVat(15);
+                localStorage.removeItem('selectedProducts');
                 console.log('Products in the sale table after bill creation: []');
             })
             .catch((error) => console.error('Error creating bill:', error));
+    };
+
+    const handleClear = () => {
+        setSelectedProducts([]);
+        localStorage.removeItem('selectedProducts');
+        console.log('Products in the sale table after clearing: []');
     };
 
     return (
@@ -195,7 +219,7 @@ function Sale() {
                                                             </td>
                                                             
                                                             <td>{product.selling_price_per_unit}</td>
-                                                            <td>{(product.quantity * product.selling_price_per_unit).toFixed(2)}</td>
+                                                            <td>{(product.quantity * parseFloat(product.selling_price_per_unit)).toFixed(2)}</td>
                                                             <td>
                                                                 <div className="form-button-action">
                                                                     <Button variant="link" className="btn-danger" onClick={() => handleRemoveProduct(index)}>
@@ -229,10 +253,7 @@ function Sale() {
                                     />
                                 </div>
                                 <div className="d-flex justify-content-between">
-                                    <Button variant="primary" className="btn-border btn-round" onClick={() => {
-                                        setSelectedProducts([]);
-                                        console.log('Products in the sale table after clearing: []');
-                                    }}>
+                                    <Button variant="primary" className="btn-border btn-round" onClick={handleClear}>
                                         Clear
                                     </Button>
                                     <Button variant="primary" className="btn-border btn-round" onClick={handleConfirm}>

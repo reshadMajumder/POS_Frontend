@@ -45,13 +45,7 @@ function TotalTable({ products, vat, discount, setVat, setDiscount }) {
                 </Dropdown>
             </div>
             <div className="card-body">
-                <Table>
-                    <thead>
-                        <tr>
-                            <th>Instance</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
+                <Table size="sm">
                     <tbody>
                         <tr>
                             <td>Subtotal</td>
@@ -69,11 +63,34 @@ function TotalTable({ products, vat, discount, setVat, setDiscount }) {
                             <td>Adjustment</td>
                             <td>{adjustment.toFixed(2)}</td>
                         </tr>
-                        <tr >
-                            <td >Total Amount</td>
-                            <td>{adjustedAmount.toFixed(2)}</td>
+                        <tr>
+                            <td style={{ fontWeight: 'bold', color: 'green' }}>Total Amount</td>
+                            <td style={{ fontWeight: 'bold', color: 'green' }}>{adjustedAmount.toFixed(2)}</td>
                         </tr>
-                        
+                    </tbody>
+                </Table>
+                <Table size="sm" className="mt-3">
+                    <tbody>
+                        <tr>
+                            <td>Payment Method</td>
+                            <td>
+                                <Form.Control as="select" size="sm">
+                                    <option>Cash</option>
+                                    <option>Card</option>
+                                    <option>Mobile Payment</option>
+                                </Form.Control>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Paid Amount</td>
+                            <td>
+                                <Form.Control type="number" size="sm" placeholder="Enter paid amount" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Due Amount</td>
+                            <td>0.00</td>
+                        </tr>
                     </tbody>
                 </Table>
             </div>
