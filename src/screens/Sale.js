@@ -3,7 +3,7 @@ import SideBar from './SideBar';
 import Navbar from './Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { searchProducts, createBill } from '../services/Api';
+import { searchProductsStock, createBill } from '../services/Api';
 import { Table, Button, Form } from 'react-bootstrap';
 import TotalTable from '../components/TotalTable';
 
@@ -15,6 +15,7 @@ function Sale() {
     const [customerPhone, setCustomerPhone] = useState('');
     const [vat, setVat] = useState(15);
     const [discount, setDiscount] = useState(0);
+    const [totalPaid, setTotalPaid] = useState(0);
 
     useEffect(() => {
         const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
@@ -27,7 +28,7 @@ function Sale() {
 
     useEffect(() => {
         if (query) {
-            searchProducts(query)
+            searchProductsStock(query)
                 .then((response) => {
                     const filteredSuggestions = response.data.filter(stock => 
                         !selectedProducts.some(selected => selected.id === stock.product.id)
@@ -100,7 +101,9 @@ function Sale() {
                 quantity: product.quantity,
                 selling_price_per_unit: product.selling_price_per_unit
             })),
-            created_at: new Date().toISOString().split('T')[0]
+            created_at: new Date().toISOString().split('T')[0],
+            total_paid: totalPaid,
+            total_due: (totalAmount + vatAmount - discount - totalPaid).toFixed(2)
         };
     
         createBill(billData)
@@ -110,6 +113,7 @@ function Sale() {
                 setCustomerPhone('');
                 setDiscount(0);
                 setVat(15);
+                setTotalPaid(0);
                 localStorage.removeItem('selectedProducts');
                 console.log('Products in the sale table after bill creation: []');
             })
@@ -129,7 +133,7 @@ function Sale() {
                 <div className="main-header">
                     <Navbar />
                 </div>
-                <div className="container-fluid pt-3" style={{ height: '100vh', overflow: 'auto' }}>
+                <div className="container-fluid pt-1" style={{ height: '100vh', overflow: 'auto' }}>
                     <div className="page-inner">
                         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                             <div>
@@ -165,8 +169,8 @@ function Sale() {
                                         </div>
                                     </div>
                                     {suggestions.length > 0 && (
-                                        <div className="suggestions">
-                                            <ul>
+                                        <div className="suggestions" style={{position:'absolute', top: '100%', left: 0, backgroundColor: 'white', width: '100%', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', zIndex: 1000 }}>
+                                            <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
                                                 {Object.values(suggestions.reduce((acc, stock) => {
                                                     if (!acc[stock.product.id]) {
                                                         acc[stock.product.id] = { ...stock, quantity: 0 }
@@ -174,7 +178,7 @@ function Sale() {
                                                     acc[stock.product.id].quantity += stock.quantity
                                                     return acc
                                                 }, {})).map((stock) => (
-                                                    <li key={stock.product.id} onClick={() => handleAddProduct(stock)}>
+                                                    <li key={stock.product.id} onClick={() => handleAddProduct(stock)}style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}>
                                                         {stock.product.name} -- {"Qty :" + stock.quantity}
                                                     </li>
                                                 ))}
@@ -231,9 +235,11 @@ function Sale() {
                                                     ))}
                                                 </tbody>
                                             </Table>
+                                            
                                         </div>
                                     </div>
                                 </div>
+                                
                             </div>
 
                             <div className="col-sm-6 col-md-3">
@@ -243,8 +249,10 @@ function Sale() {
                                     discount={discount} 
                                     setVat={setVat} 
                                     setDiscount={setDiscount} 
+                                    totalPaid={totalPaid}
+                                    setTotalPaid={setTotalPaid}
                                 />
-                                <div className="form-group">
+                                <div className="form-group pt-0">
                                     <Form.Control
                                         type="text"
                                         placeholder="Customer Phone Number"
@@ -252,6 +260,7 @@ function Sale() {
                                         onChange={(e) => setCustomerPhone(e.target.value)}
                                     />
                                 </div>
+                                
                                 <div className="d-flex justify-content-between">
                                     <Button variant="primary" className="btn-border btn-round" onClick={handleClear}>
                                         Clear
@@ -260,6 +269,7 @@ function Sale() {
                                         Confirm
                                     </Button>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
