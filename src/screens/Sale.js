@@ -16,6 +16,8 @@ function Sale() {
     const [vat, setVat] = useState(15);
     const [discount, setDiscount] = useState(0);
     const [totalPaid, setTotalPaid] = useState(0);
+    const [selectedBank, setSelectedBank] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
 
     useEffect(() => {
         const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
@@ -88,6 +90,7 @@ function Sale() {
         const totalCost = selectedProducts.reduce((acc, product) => acc + product.quantity * parseFloat(product.supplier_price_per_unit), 0);
         const vatAmount = (vat / 100) * totalAmount;
         const totalProfitOrLoss = totalAmount - totalCost - discount;
+        const total_bill = totalAmount+vatAmount;
     
         const billData = {
             customer_phone: customerPhone,
@@ -96,6 +99,7 @@ function Sale() {
             discount: discount.toFixed(2),
             total_cost: Number(totalCost.toFixed(2)),
             total_profit_or_loss: Number(totalProfitOrLoss.toFixed(2)),
+            total_Bill:total_bill,
             items: selectedProducts.map(product => ({
                 product: product.id,
                 quantity: product.quantity,
@@ -103,7 +107,8 @@ function Sale() {
             })),
             created_at: new Date().toISOString().split('T')[0],
             total_paid: totalPaid,
-            total_due: (totalAmount + vatAmount - discount - totalPaid).toFixed(2)
+            total_due: (total_bill - discount - totalPaid).toFixed(2),
+            payment_method: selectedBank
         };
     
         createBill(billData)
@@ -114,6 +119,9 @@ function Sale() {
                 setDiscount(0);
                 setVat(15);
                 setTotalPaid(0);
+                
+                setPaymentMethod('');
+                
                 localStorage.removeItem('selectedProducts');
                 console.log('Products in the sale table after bill creation: []');
             })
@@ -251,6 +259,7 @@ function Sale() {
                                     setDiscount={setDiscount} 
                                     totalPaid={totalPaid}
                                     setTotalPaid={setTotalPaid}
+                                    setSelectedBank={setSelectedBank}
                                 />
                                 <div className="form-group pt-0">
                                     <Form.Control
@@ -269,7 +278,6 @@ function Sale() {
                                         Confirm
                                     </Button>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>

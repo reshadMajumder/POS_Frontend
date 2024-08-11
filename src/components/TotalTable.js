@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Form, Dropdown } from 'react-bootstrap';
+import { fetchBanks } from '../services/Api';
 
-function TotalTable({ products, vat, discount, setVat, setDiscount ,totalPaid,setTotalPaid}) {
+function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, setTotalPaid ,setSelectedBank,adjustment_amount }) {
+    const [banks, setBanks] = useState([]);
+
+    useEffect(() => {
+        fetchBanks()
+            .then((response) => {
+                setBanks(response.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching banks:', error);
+            });
+    }, []);
+
     const subtotal = products.reduce((acc, product) => acc + product.quantity * product.selling_price_per_unit, 0);
     const vatAmount = (subtotal * vat) / 100;
     const totalAmount = subtotal + vatAmount - discount;
     const adjustedAmount = Math.floor(totalAmount);
     const adjustment = totalAmount - adjustedAmount;
+
+
+   
 
     return (
         <div className="card">
@@ -70,29 +86,33 @@ function TotalTable({ products, vat, discount, setVat, setDiscount ,totalPaid,se
                     </tbody>
                 </Table>
                 <Table size="sm" className="mt-3" style={{ width: '80%' }}>
-                  
                     <tbody>
                         <tr>
                             <td>
-                                <Form.Control as="select" size="sm" style={{ fontSize: '0.8em', width: '50px' }} placeholder="Payment">
-                                    <option>Cash</option>
-                                    <option>Card</option>
-                                    <option>Mobile Payment</option>
+                                <Form.Control
+                                    as="select"
+                                    onChange={(e) => setSelectedBank(e.target.value)} size="sm">
+                                    <option value="">Select Bank</option>
+                                    {banks.map(bank => (
+                                        <option key={bank.id} value={bank.id}>
+                                            {bank.name}
+                                        </option>
+                                    ))}
                                 </Form.Control>
                             </td>
                             <td>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Total Paid"
-                                        value={totalPaid}
-                                        onChange={(e) => setTotalPaid(parseFloat(e.target.value))}
-                                        style={{ fontSize: '0.8em', padding: '1px', width: '60px' }}
-                                    />
+                                <Form.Control
+                                    type="number"
+                                    placeholder="Total Paid"
+                                    value={totalPaid}
+                                    onChange={(e) => setTotalPaid(e.target.value)}
+                                    style={{ fontSize: '0.8em', padding: '1px', width: '80px' }}
+                                    required
+                                />
                             </td>
                         </tr>
                     </tbody>
                 </Table>
-               
             </div>
         </div>
     );

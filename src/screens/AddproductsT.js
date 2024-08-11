@@ -198,7 +198,7 @@ function AddproductsT() {
                                                         <th>ID</th>
                                                         <th>Product Name</th>
                                                         <th>QTY <span className="text-danger">*</span></th>
-                                                        <th>Supplier Price/u<span className="text-danger">*</span></th>
+                                                        <th>seller price/u<span className="text-danger">*</span></th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>

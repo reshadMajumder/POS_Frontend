@@ -30,6 +30,14 @@ export const searchProducts = (query) => {
     return axios.get(`http://localhost:8000/api/search-products/?search=${query}`);
 };
 
+export const fetchBanks = () => axios.get(`${API_URL}banks/`);
+export const createBank = (data) => axios.post(`${API_URL}banks/`, data);
+
+
+
+
+
+
 // export const ProductStock = () => axios.get(`${API_URL}supplier-products/`);
 // export const AddToStock = (data) => axios.post(`${API_URL}supplier-products/`, data);
 
@@ -39,8 +47,6 @@ export const searchProducts = (query) => {
 // export const fetchSales = () => axios.get(`${API_URL}sales/`);
 // export const createSale = (data) => axios.post(`${API_URL}sales/`, data);
 
-// export const fetchBanks = () => axios.get(`${API_URL}banks/`);
-// export const createBank = (data) => axios.post(`${API_URL}banks/`, data);
 
 
 // export const fetchSupplierProducts = () => axios.get(`${API_URL}supplier-products/`);
