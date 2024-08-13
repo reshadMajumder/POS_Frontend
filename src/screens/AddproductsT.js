@@ -3,7 +3,7 @@ import SideBar from './SideBar';
 import Navbar from './Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { searchProducts, fetchSuppliers, createProductStock } from '../services/Api';
+import { searchProducts, fetchSuppliers, createProductStock, fetchBanks } from '../services/Api';
 import { Table, Button, Form, Col, Row } from 'react-bootstrap';
 
 function AddproductsT() {
@@ -15,11 +15,21 @@ function AddproductsT() {
     const [datePurchased, setDatePurchased] = useState('');
     const [discount, setDiscount] = useState(0);
     const [totalPaid, setTotalPaid] = useState(0);
+    const [selectedBank, setSelectedBank] = useState('');
+    const [banks, setBanks] = useState([]);
 
     useEffect(() => {
         fetchSuppliers()
             .then((response) => setSuppliers(response.data))
             .catch((error) => console.error('Error fetching suppliers:', error));
+
+        fetchBanks()
+            .then((response) => setBanks(response.data))
+            .catch((error) => console.error('Error fetching banks:', error));
+        
+        // Retrieve items from local storage on mount
+        const storedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
+        setSelectedProducts(storedProducts);
     }, []);
 
     useEffect(() => {
@@ -37,6 +47,11 @@ function AddproductsT() {
         }
     }, [query, selectedProducts]);
 
+    useEffect(() => {
+        // Save selected products to local storage
+        localStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
+    }, [selectedProducts]);
+
     const handleAddProduct = (product) => {
         const updatedProducts = [...selectedProducts, { ...product, quantity: 1, supplier_price_per_unit: 0 }];
         setSelectedProducts(updatedProducts);
@@ -51,13 +66,13 @@ function AddproductsT() {
 
     const handleQuantityChange = (index, newQuantity) => {
         const updatedProducts = [...selectedProducts];
-        updatedProducts[index].quantity = newQuantity;
+        updatedProducts[index].quantity = newQuantity || 1;
         setSelectedProducts(updatedProducts);
     };
 
     const handlePriceChange = (index, newPrice) => {
         const updatedProducts = [...selectedProducts];
-        updatedProducts[index].supplier_price_per_unit = newPrice;
+        updatedProducts[index].supplier_price_per_unit = newPrice || 0;
         setSelectedProducts(updatedProducts);
     };
 
@@ -67,42 +82,6 @@ function AddproductsT() {
 
     const handleDatePurchasedChange = (e) => {
         setDatePurchased(e.target.value);
-    };
-
-    const handleAddProductsSubmit = () => {
-        if (!selectedSupplier || !datePurchased || selectedProducts.length === 0) {
-            alert('Please fill in all required fields');
-            return;
-        }
-
-        const data = selectedProducts.map(product => ({
-            product: product.id,
-            supplier: selectedSupplier,
-            quantity: product.quantity,
-            supplier_price_per_unit: product.supplier_price_per_unit,
-            date_purchased: datePurchased
-        }));
-
-        createProductStock(data)
-            .then(response => {
-                console.log('Products added successfully:', response);
-                // Reset form or show success message
-                setSelectedProducts([]);
-                setSelectedSupplier('');
-                setDatePurchased('');
-            })
-            .catch(error => {
-                console.error('Error adding products:', error);
-                if (error.response && error.response.data) {
-                    let errorMessage = 'Error: ';
-                    for (let field in error.response.data) {
-                        errorMessage += `${field}: ${error.response.data[field].join(', ')}; `;
-                    }
-                    alert(errorMessage);
-                } else {
-                    alert('An error occurred while adding products. Please try again.');
-                }
-            });
     };
 
     const calculateTotal = () => {
@@ -118,6 +97,65 @@ function AddproductsT() {
         setQuery('');
         setDiscount(0);
         setTotalPaid(0);
+        setSelectedBank('');
+        
+        // Clear local storage
+        localStorage.removeItem('selectedProducts');
+    };
+
+    const handleAddProductsSubmit = () => {
+        if (!selectedSupplier || !datePurchased || selectedProducts.length === 0) {
+            alert('Please fill in all required fields');
+            return;
+        }
+    
+        // Preparing items for submission
+        const items = selectedProducts.map(product => {
+            if (!product.quantity || !product.supplier_price_per_unit) {
+                throw new Error('Quantity and Price per unit are required for all products');
+            }
+            return {
+                product: product.id,  // Product ID
+                quantity: product.quantity,  // Quantity
+                supplier_price_per_unit: product.supplier_price_per_unit.toFixed(2),  // Price per unit
+                date_purchased: datePurchased,  // Date Purchased
+                supplier: selectedSupplier  // Supplier ID
+            };
+        });
+    
+        // Data to be sent to the backend
+        const data = {
+            stock_bill: 18, // Assuming this is a reference to the bill ID
+            items,  // Array of items to be added
+            total_amount: calculateTotal().toFixed(2),  // Total amount calculated
+            total_paid: totalPaid.toFixed(2),  // Total amount paid
+            total_due: (calculateTotal() - totalPaid - discount).toFixed(2),  // Total due after discount
+            payment_method: selectedBank,  // Payment method (bank ID)
+            discount: discount.toFixed(2),  // Discount applied
+
+
+            updated_at: new Date().toISOString().split('T')[0],  // Date updated
+            created_at: new Date().toISOString().split('T')[0]  // Date created
+        };
+    
+        // Sending data to backend
+        createProductStock(data)
+            .then(response => {
+                console.log('Products added successfully:', response);
+                handleClear();
+            })
+            .catch(error => {
+                console.error('Error adding products:', error);
+                if (error.response && error.response.data) {
+                    let errorMessage = 'Error: ';
+                    for (let field in error.response.data) {
+                        errorMessage += `${field}: ${error.response.data[field].join(', ')}; `;
+                    }
+                    alert(errorMessage);
+                } else {
+                    alert('An error occurred while adding products. Please try again.');
+                }
+            });
     };
 
     return (
@@ -137,7 +175,7 @@ function AddproductsT() {
                         <Row>
                             <Col md={8}>
                                 <div className="card">
-                                    <div className="nav-search d-lg-flex  m-1">
+                                    <div className="nav-search d-lg-flex m-1">
                                         <div className="input-group">
                                             <div className="input-group-prepend">
                                                 <button type="submit" className="btn btn-search pe-1">
@@ -173,7 +211,11 @@ function AddproductsT() {
                                     <div className="card-body pt-1" style={{ height: '65vh', overflow: 'auto' }}>
                                         <Form.Group className="mb-1">
                                             <Form.Label>Select Supplier <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control as="select" value={selectedSupplier} onChange={handleSupplierChange} required>
+                                            <Form.Control 
+                                                as="select" 
+                                                value={selectedSupplier} 
+                                                onChange={handleSupplierChange} 
+                                                required>
                                                 <option value="">Choose a supplier</option>
                                                 {suppliers.map((supplier) => (
                                                     <option key={supplier.id} value={supplier.id}>
@@ -198,13 +240,13 @@ function AddproductsT() {
                                                         <th>ID</th>
                                                         <th>Product Name</th>
                                                         <th>QTY <span className="text-danger">*</span></th>
-                                                        <th>seller price/u<span className="text-danger">*</span></th>
+                                                        <th>Price/u <span className="text-danger">*</span></th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {selectedProducts.map((product, index) => (
-                                                        <tr key={index}>
+                                                        <tr key={product.id}>
                                                             <td>{product.id}</td>
                                                             <td>{product.name}</td>
                                                             <td>
@@ -212,8 +254,7 @@ function AddproductsT() {
                                                                     type="number"
                                                                     min="1"
                                                                     value={product.quantity}
-                                                                    onChange={(e) => handleQuantityChange(index, parseInt(e.target.value))}
-                                                                    style={{ width: '80px' }}
+                                                                    onChange={(e) => handleQuantityChange(index, parseInt(e.target.value, 10))}
                                                                     required
                                                                 />
                                                             </td>
@@ -221,19 +262,15 @@ function AddproductsT() {
                                                                 <Form.Control
                                                                     type="number"
                                                                     min="0"
-                                                                    step="0.01"
                                                                     value={product.supplier_price_per_unit}
                                                                     onChange={(e) => handlePriceChange(index, parseFloat(e.target.value))}
-                                                                    style={{ width: '100px' }}
                                                                     required
                                                                 />
                                                             </td>
                                                             <td>
-                                                                <div className="form-button-action">
-                                                                    <Button variant="link" className="btn-danger" onClick={() => handleRemoveProduct(index)}>
-                                                                        <FontAwesomeIcon icon={faTimes} />
-                                                                    </Button>
-                                                                </div>
+                                                                <Button variant="danger" size="sm" onClick={() => handleRemoveProduct(index)}>
+                                                                    <FontAwesomeIcon icon={faTimes} />
+                                                                </Button>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -243,40 +280,69 @@ function AddproductsT() {
                                     </div>
                                 </div>
                             </Col>
+
                             <Col md={4}>
-                            <div className="card-body">
-                                        <Table size="sm" className="table-condensed">
-                                            <tbody>
-                                                <tr>
-                                                    <td>Subtotal</td>
-                                                    <td>{selectedProducts.reduce((total, product) => total + (product.quantity * product.supplier_price_per_unit), 0).toFixed(2)}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Discount</td>
-                                                    <td><input type="number" value={discount} onChange={(e) => setDiscount(parseFloat(e.target.value) )} /></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Total paid</td>
-                                                    <td><input type="number"min='0' value={totalPaid} onChange={(e) => setTotalPaid(parseFloat(e.target.value) )} /></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Due</td>
-                                                    <td>{(calculateTotal() - totalPaid).toFixed(2)}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ fontWeight: 'bold', color: 'green' }}>Total</td>
-                                                    <td style={{ fontWeight: 'bold', color: 'green' }}>{calculateTotal().toFixed(2)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </Table>
+                                <div className="card">
+                                    <div className="card-header">
+                                        <div className="card-title">Summary</div>
                                     </div>
-                                <div className="d-flex justify-content-end mt-3">
-                                    <Button variant="secondary" className="btn-border btn-round me-2" onClick={handleClear}>
-                                        Clear
-                                    </Button>
-                                    <Button variant="primary" className="btn-border btn-round" onClick={handleAddProductsSubmit}>
-                                        Add Products
-                                    </Button>
+                                    <div className="card-body pt-1">
+                                        <Form.Group className="mb-1">
+                                            <Form.Label>Discount</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                min="0"
+                                                value={discount}
+                                                onChange={(e) => setDiscount(parseFloat(e.target.value))}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group className="mb-1">
+                                            <Form.Label>Total Paid</Form.Label>
+                                            <Form.Control
+                                                type="number"
+                                                min="0"
+                                                value={totalPaid}
+                                                onChange={(e) => setTotalPaid(parseFloat(e.target.value))}
+                                            />
+                                        </Form.Group>
+                                        <Form.Group className="mb-1">
+                                            <Form.Label>Payment Method</Form.Label>
+                                            <Form.Control 
+                                                as="select" 
+                                                value={selectedBank} 
+                                                onChange={(e) => setSelectedBank(e.target.value)} 
+                                                required>
+                                                <option value="">Choose a bank</option>
+                                                {banks.map((bank) => (
+                                                    <option key={bank.id} value={bank.id}>
+                                                        {bank.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Control>
+                                        </Form.Group>
+                                        <div className="d-flex justify-content-between">
+                                            <h6>Total:</h6>
+                                            <h6>{calculateTotal().toFixed(2)}</h6>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <h6>Discount:</h6>
+                                            <h6>{discount.toFixed(2)}</h6>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <h6>Total Paid:</h6>
+                                            <h6>{totalPaid.toFixed(2)}</h6>
+                                        </div>
+                                        <div className="d-flex justify-content-between">
+                                            <h6>Total Due:</h6>
+                                            <h6>{(calculateTotal() - totalPaid - discount).toFixed(2)}</h6>
+                                        </div>
+                                        <Button 
+                                            variant="primary" 
+                                            className="btn-block" 
+                                            onClick={handleAddProductsSubmit}>
+                                            Add Products
+                                        </Button>
+                                    </div>
                                 </div>
                             </Col>
                         </Row>
@@ -286,5 +352,6 @@ function AddproductsT() {
         </div>
     );
 }
+
 
 export default AddproductsT;

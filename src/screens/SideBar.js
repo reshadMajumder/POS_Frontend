@@ -41,7 +41,7 @@ function SideBar() {
 
                         
                         <SidebarItems title="Transactions" iconName={faLayerGroup} 
-                        items1={<SideBarColapse title="Transaction" destination="/login" />} />
+                        items1={<SideBarColapse title="Bank" destination="/bank" />} />
 
 
                         <SidebarItems title="Expense" iconName={faStickyNote} 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProducts, createProduct } from '../services/Api';
+import { fetchProducts, createProduct, fetchUnit } from '../services/Api';
 import { Form, Button, Container, Table, Navbar } from 'react-bootstrap';
 import SideBar from './SideBar';
 import NavT from './NavT';
@@ -9,10 +9,13 @@ function Products() {
     const [name, setName] = useState('');
     const [unit, setUnit] = useState('');
     const [sellingPricePerUnit, setSellingPricePerUnit] = useState('');
+    const [units, setUnits] = useState([]);
 
     useEffect(() => {
         fetchProducts().then((response) => setProducts(response.data))
             .catch(error => console.error('Error fetching products:', error));
+        fetchUnit().then((response) => setUnits(response.data))
+            .catch(error => console.error('Error fetching units:', error));
     }, []);
 
     const handleSubmit = (e) => {
@@ -53,11 +56,17 @@ function Products() {
                                     <Form.Group controlId="formProductUnit">
                                         <Form.Label>Unit</Form.Label>
                                         <Form.Control
-                                            type="text"
-                                            placeholder="Enter unit (e.g., kg, liter, pc)"
+                                            as="select"
                                             value={unit}
                                             onChange={(e) => setUnit(e.target.value)}
-                                        />
+                                        >
+                                            <option value="">Select a unit</option>
+                                            {units.map((u) => (
+                                                <option key={u.id} value={u.name}>
+                                                    {u.name}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
                                     </Form.Group>
                                     <Form.Group controlId="formProductSellingPricePerUnit">
                                         <Form.Label>Selling Price per Unit</Form.Label>

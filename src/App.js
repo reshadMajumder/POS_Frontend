@@ -12,6 +12,7 @@ import Suppliers from './screens/Suppliers';
 import Products from './screens/Products';
 import ProductStock from './screens/ProductStock';
 import AddproductsT from './screens/AddproductsT';
+import BankDetails from './screens/BankDetails';
 
 
 function App() {
@@ -46,6 +47,10 @@ function App() {
         <Route
             path="/AddToStock"
             element={isAuthenticated ? <AddproductsT/> : <Navigate to="/login" />}
+        />
+        <Route
+            path="/bank"
+            element={isAuthenticated ? <BankDetails/> : <Navigate to="/login" />}
         />
     </Routes>
 </Router>

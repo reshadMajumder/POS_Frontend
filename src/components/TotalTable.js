@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Form, Dropdown } from 'react-bootstrap';
 import { fetchBanks } from '../services/Api';
 
-function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, setTotalPaid ,setSelectedBank,adjustment_amount }) {
+function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, setTotalPaid, setSelectedBank, adjustment_amount }) {
     const [banks, setBanks] = useState([]);
 
     useEffect(() => {
@@ -22,7 +22,7 @@ function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, s
     const adjustment = totalAmount - adjustedAmount;
 
 
-   
+
 
     return (
         <div className="card">
@@ -61,58 +61,60 @@ function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, s
                 </Dropdown>
             </div>
             <div className="card-body">
-                <Table size="sm" className="table-condensed">
-                    <tbody>
-                        <tr>
-                            <td>Subtotal</td>
-                            <td>{subtotal.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td>VAT ({vat}%)</td>
-                            <td>{vatAmount.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td>Discount</td>
-                            <td>{discount.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td>Adjustment</td>
-                            <td>{adjustment.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td style={{ fontWeight: 'bold', color: 'green' }}>Total</td>
-                            <td style={{ fontWeight: 'bold', color: 'green' }}>{adjustedAmount.toFixed(2)}</td>
-                        </tr>
-                    </tbody>
-                </Table>
-                <Table size="sm" className="mt-3" style={{ width: '80%' }}>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <Form.Control
-                                    as="select"
-                                    onChange={(e) => setSelectedBank(e.target.value)} size="sm">
-                                    <option value="">Select Bank</option>
-                                    {banks.map(bank => (
-                                        <option key={bank.id} value={bank.id}>
-                                            {bank.name}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </td>
-                            <td>
-                                <Form.Control
-                                    type="number"
-                                    placeholder="Total Paid"
-                                    value={totalPaid}
-                                    onChange={(e) => setTotalPaid(e.target.value)}
-                                    style={{ fontSize: '0.8em', padding: '1px', width: '80px' }}
-                                    required
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </Table>
+                <div className="d-flex justify-content-between">
+
+                    <h6>Subtotal</h6>
+                    <h6>{subtotal.toFixed(2)}</h6>
+                </div>
+                <div className="d-flex justify-content-between">
+                    <h6>VAT ({vat}%)</h6>
+                    <h6>{vatAmount.toFixed(2)}</h6>
+                </div>
+                <div className="d-flex justify-content-between">
+                    <h6>Discount</h6>
+                    <h6>{discount.toFixed(2)}</h6>
+                </div>
+                <div className="d-flex justify-content-between">
+                    <h6>Adjustment</h6>
+                    <h6>{adjustment.toFixed(2)}</h6>
+                </div>
+                <div className="d-flex justify-content-between">
+                    <h6 style={{ fontWeight: 'bold', color: 'green' }}>Total</h6>
+                    <h6 style={{ fontWeight: 'bold', color: 'green' }}>{adjustedAmount.toFixed(2)}</h6>
+                </div>
+                  <Table size="sm" className="mt-1" style={{ width: '80%' }}>
+                      <tbody>
+                          <tr>
+                              <td>Payment Method:</td>
+                              <td>
+                                  <Form.Control
+                                      as="select"
+                                      onChange={(e) => setSelectedBank(e.target.value)} size="sm">
+                                      <option value="">Select</option>
+                                      {banks.map(bank => (
+                                          <option key={bank.id} value={bank.id}>
+                                              {bank.name}
+                                          </option>
+                                      ))}
+                                  </Form.Control>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td>Total Paid:</td>
+                              <td>
+                                  <Form.Control
+                                      type="number"
+                                      placeholder="Total Paid"
+                                      value={totalPaid}
+                                      onChange={(e) => setTotalPaid(e.target.value)}
+                                      style={{ fontSize: '0.9em', padding: '1px', width: '80px' }}
+                                      required
+                                  />
+                              </td>
+                          </tr>
+                      </tbody>
+                  </Table>
+                
             </div>
         </div>
     );
