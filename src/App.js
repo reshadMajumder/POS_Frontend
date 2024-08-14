@@ -7,12 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/css/kaiadmin.min.css'
 import MainScreen from './screens/MainScreen';
 import Sale from './screens/Sale';
-import AddProducts from './screens/AddProducts';
 import Suppliers from './screens/Suppliers';
 import Products from './screens/Products';
 import ProductStock from './screens/ProductStock';
 import AddproductsT from './screens/AddproductsT';
 import BankDetails from './screens/BankDetails';
+import Dashboard from './screens/Dashboard';
 
 
 function App() {
@@ -51,6 +51,10 @@ function App() {
         <Route
             path="/bank"
             element={isAuthenticated ? <BankDetails/> : <Navigate to="/login" />}
+        />
+        <Route
+            path="/another"
+            element={isAuthenticated ? <Dashboard/> : <Navigate to="/login" />}
         />
     </Routes>
 </Router>

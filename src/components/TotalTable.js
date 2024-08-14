@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Form, Dropdown } from 'react-bootstrap';
+import { Form, Dropdown } from 'react-bootstrap';
 import { fetchBanks } from '../services/Api';
 
 function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, setTotalPaid, setSelectedBank, adjustment_amount }) {
@@ -20,9 +20,6 @@ function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, s
     const totalAmount = subtotal + vatAmount - discount;
     const adjustedAmount = Math.floor(totalAmount);
     const adjustment = totalAmount - adjustedAmount;
-
-
-
 
     return (
         <div className="card">
@@ -62,7 +59,6 @@ function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, s
             </div>
             <div className="card-body">
                 <div className="d-flex justify-content-between">
-
                     <h6>Subtotal</h6>
                     <h6>{subtotal.toFixed(2)}</h6>
                 </div>
@@ -82,39 +78,36 @@ function TotalTable({ products, vat, discount, setVat, setDiscount, totalPaid, s
                     <h6 style={{ fontWeight: 'bold', color: 'green' }}>Total</h6>
                     <h6 style={{ fontWeight: 'bold', color: 'green' }}>{adjustedAmount.toFixed(2)}</h6>
                 </div>
-                  <Table size="sm" className="mt-1" style={{ width: '80%' }}>
-                      <tbody>
-                          <tr>
-                              <td>Payment Method:</td>
-                              <td>
-                                  <Form.Control
-                                      as="select"
-                                      onChange={(e) => setSelectedBank(e.target.value)} size="sm">
-                                      <option value="">Select</option>
-                                      {banks.map(bank => (
-                                          <option key={bank.id} value={bank.id}>
-                                              {bank.name}
-                                          </option>
-                                      ))}
-                                  </Form.Control>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td>Total Paid:</td>
-                              <td>
-                                  <Form.Control
-                                      type="number"
-                                      placeholder="Total Paid"
-                                      value={totalPaid}
-                                      onChange={(e) => setTotalPaid(e.target.value)}
-                                      style={{ fontSize: '0.9em', padding: '1px', width: '80px' }}
-                                      required
-                                  />
-                              </td>
-                          </tr>
-                      </tbody>
-                  </Table>
-                
+                <div className="mt-3">
+                    <Form.Group className="d-flex align-items-center">
+                        <Form.Label className="me-2 mb-0">Payment Method:</Form.Label>
+                        <Form.Control
+                            as="select"
+                            onChange={(e) => setSelectedBank(e.target.value)}
+                            size="sm"
+                            className="flex-grow-1"
+                        >
+                            <option value="">Select</option>
+                            {banks.map(bank => (
+                                <option key={bank.id} value={bank.id}>
+                                    {bank.name}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group className="mt-2 d-flex align-items-center">
+                        <Form.Label className="me-2 mb-0">Total Paid:</Form.Label>
+                        <Form.Control
+                            type="number"
+                            placeholder="Total Paid"
+                            value={totalPaid}
+                            onChange={(e) => setTotalPaid(e.target.value)}
+                            style={{ fontSize: '0.9em', padding: '1px', width: '40px' }}
+                            required
+                            className="flex-grow-1"
+                        />
+                    </Form.Group>
+                </div>
             </div>
         </div>
     );

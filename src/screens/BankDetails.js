@@ -3,6 +3,8 @@ import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import Navbar from './Navbar';
 import SideBar from './SideBar';
 import { fetchBanks, createBank } from '../services/Api';
+import SidebarN from '../components/SidebarN';
+import NavbarN from '../components/NavbarN';
 
 function BankDetails() {
     const [banks, setBanks] = useState([]);
@@ -31,12 +33,13 @@ function BankDetails() {
     };
 
     return (
-        <div className="wrapper">
-            <SideBar/>
-            <div class="main-panel">
-                <div class="main-header">
-                    <Navbar/>
-                </div>
+        <div className="wrapper d-flex">
+            <SidebarN />
+            <div className="main-content">
+                <NavbarN />
+                <div className="p-3">
+                    {/* Add your main content here */}
+
 
                 
 <Container className="content mt-4">
@@ -109,6 +112,7 @@ function BankDetails() {
                 </Container>
                 
             </div>     
+        </div>
         </div>
     );
 }

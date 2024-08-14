@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { searchProducts, fetchSuppliers, createProductStock, fetchBanks } from '../services/Api';
 import { Table, Button, Form, Col, Row } from 'react-bootstrap';
+import SidebarN from '../components/SidebarN';
+import NavbarN from '../components/NavbarN';
 
 function AddproductsT() {
     const [query, setQuery] = useState('');
@@ -159,19 +161,13 @@ function AddproductsT() {
     };
 
     return (
-        <div>
-            <SideBar />
-            <div className="main-panel">
-                <div className="main-header">
-                    <Navbar />
-                </div>
-                <div className="container-fluid pt-1" style={{ height: '100vh', overflow: 'auto' }}>
-                    <div className="page-inner">
-                        <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                            <div>
-                                <h3 className="fw-bold">Add Products</h3>
-                            </div>
-                        </div>
+        <div className="wrapper d-flex">
+            <SidebarN />
+            <div className="main-content">
+                <NavbarN />
+                <div className="p-3">
+                    {/* Add your main content here */}
+
                         <Row>
                             <Col md={8}>
                                 <div className="card">
@@ -209,31 +205,36 @@ function AddproductsT() {
                                         <div className="card-title">Products to Add</div>
                                     </div>
                                     <div className="card-body pt-1" style={{ height: '65vh', overflow: 'auto' }}>
-                                        <Form.Group className="mb-1">
-                                            <Form.Label>Select Supplier <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control 
-                                                as="select" 
-                                                value={selectedSupplier} 
-                                                onChange={handleSupplierChange} 
-                                                required>
-                                                <option value="">Choose a supplier</option>
-                                                {suppliers.map((supplier) => (
-                                                    <option key={supplier.id} value={supplier.id}>
-                                                        {supplier.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Control>
-                                        </Form.Group>
-                                        <Form.Group className="mb-1">
-                                            <Form.Label>Date Purchased <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                value={datePurchased}
-                                                onChange={handleDatePurchasedChange}
-                                                required
-                                            />
-                                        </Form.Group>
-                                        <div className="table-responsive">
+                                        <Row>
+                                            <Col md={6}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label>Select Supplier <span className="text-danger">*</span></Form.Label>
+                                                    <Form.Control 
+                                                        as="select" 
+                                                        value={selectedSupplier} 
+                                                        onChange={handleSupplierChange} 
+                                                        required>
+                                                        <option value="">Choose a supplier</option>
+                                                        {suppliers.map((supplier) => (
+                                                            <option key={supplier.id} value={supplier.id}>
+                                                                {supplier.name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label>Date Purchased <span className="text-danger">*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="date"
+                                                        value={datePurchased}
+                                                        onChange={handleDatePurchasedChange}
+                                                        required
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>                                        <div className="table-responsive">
                                             <Table striped bordered hover size="sm">
                                                 <thead>
                                                     <tr>
@@ -252,18 +253,19 @@ function AddproductsT() {
                                                             <td>
                                                                 <Form.Control
                                                                     type="number"
-                                                                    min="1"
-                                                                    value={product.quantity}
-                                                                    onChange={(e) => handleQuantityChange(index, parseInt(e.target.value, 10))}
+                                                                    min="0"
+                                                                    value={product.quantity||''}
+                                                                    onChange={(e) => handleQuantityChange(index, e.target.value === '' ? '' : parseInt(e.target.value, 10))}
                                                                     required
+                                                                    className="text-center"
                                                                 />
                                                             </td>
                                                             <td>
                                                                 <Form.Control
                                                                     type="number"
-                                                                    min="0"
-                                                                    value={product.supplier_price_per_unit}
-                                                                    onChange={(e) => handlePriceChange(index, parseFloat(e.target.value))}
+                                                                    min="1"
+                                                                    value={product.supplier_price_per_unit || ''}
+                                                                    onChange={(e) => handlePriceChange(index, e.target.value === '' ? '' : parseFloat(e.target.value))}
                                                                     required
                                                                 />
                                                             </td>
@@ -349,7 +351,6 @@ function AddproductsT() {
                     </div>
                 </div>
             </div>
-        </div>
     );
 }
 

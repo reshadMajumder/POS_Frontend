@@ -3,6 +3,8 @@ import { fetchProducts, fetchSuppliers, createStock } from '../services/Api';
 import { Form, Button, Container, Alert, Row, Col, Card, Table } from 'react-bootstrap';
 import SideBar from './SideBar';
 import Navbar from './Navbar';
+import NavbarN from '../components/NavbarN';
+import SidebarN from '../components/SidebarN';
 
 function AddProducts() {
     const [products, setProducts] = useState([]);
@@ -75,13 +77,13 @@ function AddProducts() {
     }
 
     return (
-        <div className="wrapper">
-            <SideBar />
-            <div className="main-panel">
-                <div className="main-header">
-                    <Navbar />
-                </div>
-                <div className="container-fluid pt-5 mt-4" >
+        <div className="wrapper d-flex">
+            <SidebarN />
+            <div className="main-content">
+                <NavbarN />
+                <div className="p-3">
+                    {/* Add your main content here */}
+                    <div className="container-fluid pt-5 mt-4" >
                     <div className="page-inner" style={{ height: 'calc(100vh - 70px)', overflow: 'auto' }} >
                         
                         <Row >
@@ -203,8 +205,12 @@ function AddProducts() {
                         </Row>
                     </div>
                 </div>
+
+
+                </div>
             </div>
         </div>
+
     );
 }
 

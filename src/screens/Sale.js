@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import SideBar from './SideBar';
-import Navbar from './Navbar';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { searchProductsStock, createBill } from '../services/Api';
 import { Table, Button, Form } from 'react-bootstrap';
 import TotalTable from '../components/TotalTable';
+import SidebarN from '../components/SidebarN';
+import NavbarN from '../components/NavbarN';
 
 function Sale() {
     const [query, setQuery] = useState('');
@@ -135,14 +136,14 @@ function Sale() {
     };
 
     return (
-        <div>
-            <SideBar />
-            <div className="main-panel">
-                <div className="main-header">
-                    <Navbar />
-                </div>
-                <div className="container-fluid pt-1" style={{ height: '100vh', overflow: 'auto' }}>
-                    <div className="page-inner">
+        <div className="wrapper d-flex">
+            <SidebarN />
+            <div className="main-content" style={{overflow: 'hidden'}}>
+                <NavbarN />
+                <div className="p-3">
+                    {/* Add your main content here */}
+                <div className="container-fluid pt-1" style={{overflow: 'auto'}}>
+                    <div className="page-inner" >
                         <div className="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                             <div>
                                 <h3 className="fw-bold">Sell items</h3>
@@ -282,6 +283,7 @@ function Sale() {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );
