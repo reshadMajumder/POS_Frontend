@@ -12,7 +12,9 @@ import Products from './screens/Products';
 import ProductStock from './screens/ProductStock';
 import AddproductsT from './screens/AddproductsT';
 import BankDetails from './screens/BankDetails';
-import Dashboard from './screens/Dashboard';
+import Assets from './screens/Assets';
+import CashTransaction from './screens/CashTransaction';
+import Liabilities from './screens/Liabilities';
 
 
 function App() {
@@ -53,8 +55,16 @@ function App() {
             element={isAuthenticated ? <BankDetails/> : <Navigate to="/login" />}
         />
         <Route
-            path="/another"
-            element={isAuthenticated ? <Dashboard/> : <Navigate to="/login" />}
+            path="/assets"
+            element={isAuthenticated ? <Assets/> : <Navigate to="/login" />}
+        />
+        <Route
+            path="/cash"
+            element={isAuthenticated ? <CashTransaction/> : <Navigate to="/login" />}
+        />
+        <Route
+            path="/liabilities"
+            element={isAuthenticated ? <Liabilities/> : <Navigate to="/login" />}
         />
     </Routes>
 </Router>

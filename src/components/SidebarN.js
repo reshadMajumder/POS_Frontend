@@ -96,10 +96,31 @@ function SidebarN() {
                         <span>Bank</span>
                     </Link>
                 </li>
+
+
                 <li className="sidebar-item">
-                    <Link to={'/bank'} className="sidebar-link">
+                    <Link className={`sidebar-link ${expandedItems['transaction'] ? '' : 'collapsed'}`} onClick={() => toggleItem('transaction')}>
                         <i className="bi bi-cash-coin"></i>
-                        <span>Expense</span>
+                        <span>Transsections</span>
+                    </Link>
+                    <ul id="auth" className={`sidebar-dropdown list ${expandedItems['transaction'] ? 'show' : 'collapse'}`}>
+                        <li className="sidebar-item">
+                            <Link to={'/Cash'} className="sidebar-link"><i className="bi bi-box-seam"></i>cash</Link>
+                        </li>
+                        
+                        <li className="sidebar-item">
+                            <Link to={'/liabilities'} className="sidebar-link"><i className="bi bi-eye"></i>Liabilities</Link>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+
+                <li className="sidebar-item">
+                    <Link to={'/assets'} className="sidebar-link">
+                        <i className="bi bi-columns-gap"></i>
+                        <span>Assets</span>
                     </Link>
                 </li>
                 <li className="sidebar-item">
@@ -123,8 +144,10 @@ function SidebarN() {
 
 
             <div className="sidebar-footer">
-                <button className="sidebar-link mb-4 px-4" onClick={handleLogout} style={{ background: 'none', border: 'none', color:'white' }}>
-                    <i className="bi bi-box-arrow-right"></i>
+                <button className="sidebar-link mb-4 px-2" onClick={handleLogout} style={{ background: 'none', border: 'none', color:'white' }}>
+                    <i className="bi bi-box-arrow-right"> </i>
+                
+                LogOut
                 </button>            
                 </div>
         </aside>

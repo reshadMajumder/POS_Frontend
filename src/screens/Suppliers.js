@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchSuppliers, createSupplier } from '../services/Api';
 import { Form, Button, Container, Table } from 'react-bootstrap';
-import SideBar from './SideBar';
-import NavT from './NavT';
-import Navbar from './Navbar';
+
 import NavbarN from '../components/NavbarN';
 import SidebarN from '../components/SidebarN';
 

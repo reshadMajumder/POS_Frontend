@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import SideBar from './SideBar';
-import Navbar from './Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { searchProducts, fetchSuppliers, createProductStock, fetchBanks } from '../services/Api';
@@ -68,7 +66,7 @@ function AddproductsT() {
 
     const handleQuantityChange = (index, newQuantity) => {
         const updatedProducts = [...selectedProducts];
-        updatedProducts[index].quantity = newQuantity || 1;
+        updatedProducts[index].quantity = newQuantity;
         setSelectedProducts(updatedProducts);
     };
 
@@ -259,6 +257,8 @@ function AddproductsT() {
                                                                     required
                                                                     className="text-center"
                                                                 />
+
+
                                                             </td>
                                                             <td>
                                                                 <Form.Control

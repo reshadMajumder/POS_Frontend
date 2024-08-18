@@ -108,7 +108,7 @@ function Sale() {
             })),
             created_at: new Date().toISOString().split('T')[0],
             total_paid: totalPaid,
-            total_due: (total_bill - discount - totalPaid).toFixed(2),
+            total_due: Math.floor(total_bill - discount - totalPaid),
             payment_method: selectedBank
         };
     

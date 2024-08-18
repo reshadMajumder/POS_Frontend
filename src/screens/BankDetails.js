@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
-import Navbar from './Navbar';
-import SideBar from './SideBar';
 import { fetchBanks, createBank } from '../services/Api';
 import SidebarN from '../components/SidebarN';
 import NavbarN from '../components/NavbarN';

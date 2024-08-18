@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchProducts, fetchSuppliers, createStock } from '../services/Api';
-import { Form, Button, Container, Alert, Row, Col, Card, Table } from 'react-bootstrap';
-import SideBar from './SideBar';
-import Navbar from './Navbar';
+import { Form, Button, Alert, Row, Col, Card, Table } from 'react-bootstrap';
+
 import NavbarN from '../components/NavbarN';
 import SidebarN from '../components/SidebarN';
 
