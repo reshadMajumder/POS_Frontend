@@ -27,7 +27,7 @@ export const createBill = (billData) => {
 };
 
 export const searchProducts = (query) => {
-    return axios.get(`http://localhost:8000/api/search-products/?search=${query}`);
+    return axios.get(`${API_URL}search-products/?search=${query}`);
 };
 
 export const fetchBanks = () => axios.get(`${API_URL}banks/`);
