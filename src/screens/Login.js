@@ -12,7 +12,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8000/api/login/', {
+            const response = await axios.post('https://point-of-sale-sable.vercel.app/api/login/', {
                 username,
                 password
             });
