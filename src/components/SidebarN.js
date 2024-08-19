@@ -114,6 +114,22 @@ function SidebarN() {
 
                     </ul>
                 </li>
+                <li className="sidebar-item">
+                    <Link className={`sidebar-link ${expandedItems['returns'] ? '' : 'collapsed'}`} onClick={() => toggleItem('returns')}>
+                        <i className="bi bi-arrow-counterclockwise"></i>
+                        <span>Returns</span>
+                    </Link>
+                    <ul id="auth" className={`sidebar-dropdown list ${expandedItems['returns'] ? 'show' : 'collapse'}`}>
+                        <li className="sidebar-item">
+                            <Link to={'/sale-return'} className="sidebar-link"><i className="bi bi-box-seam"></i>Sale return</Link>
+                        </li>
+                        
+                        <li className="sidebar-item">
+                            <Link to={'/stock-return'} className="sidebar-link"><i className="bi bi-eye"></i>Stock return</Link>
+                        </li>
+
+                    </ul>
+                </li>
 
 
 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/';
+const API_URL = 'https://point-of-sale-sable.vercel.app/api/';
 
 export const fetchSuppliers = () => axios.get(`${API_URL}suppliers/`);
 export const createSupplier = (data) => axios.post(`${API_URL}suppliers/`, data);
