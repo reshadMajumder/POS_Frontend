@@ -15,6 +15,7 @@ import BankDetails from './screens/BankDetails';
 import Assets from './screens/Assets';
 import CashTransaction from './screens/CashTransaction';
 import Liabilities from './screens/Liabilities';
+import SaleReturn from './screens/SaleReturn';
 
 
 function App() {
@@ -65,6 +66,10 @@ function App() {
         <Route
             path="/liabilities"
             element={isAuthenticated ? <Liabilities/> : <Navigate to="/login" />}
+        />
+        <Route
+            path="/sale-return"
+            element={isAuthenticated ? <SaleReturn/> : <Navigate to="/login" />}
         />
     </Routes>
 </Router>
