@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { fetchSuppliers, createSupplier } from '../services/Api';
 import { Form, Button, Container, Table } from 'react-bootstrap';
-import SideBar from './SideBar';
-import NavT from './NavT';
-import Navbar from './Navbar';
+
+import NavbarN from '../components/NavbarN';
+import SidebarN from '../components/SidebarN';
 
 function Supplier() {
     const [suppliers, setSuppliers] = useState([]);
@@ -28,12 +28,14 @@ function Supplier() {
     };
 
     return (
-        <div className="wrapper">
-            <SideBar />
-            <div className="main-panel">
-                <div className="main-header">
-                <Navbar/>
-                </div>
+        <div className="wrapper d-flex">
+        <SidebarN />
+        <div className="main-content">
+            <NavbarN />
+            <div className="p-3">
+                {/* Add your main content here */}
+
+
                 <div className="row">
                     <div className="card">
                         <div className="card-header">
@@ -97,6 +99,7 @@ function Supplier() {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     );
 }

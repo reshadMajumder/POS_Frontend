@@ -3020,7 +3020,7 @@ label.error {
 .table-responsive {
   width: 100% !important;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  
   -ms-overflow-style: -ms-autohiding-scrollbar; }
 
 /*     Navbar     */
@@ -3306,7 +3306,7 @@ label.error {
   font-weight: 400;
   font-size: 11px;
   border: 1px solid #ddd;
-  height: fit-content !important; }
+   }
 
 [class*="badge-"]:not(.badge-count) {
   border: 0px !important; }
@@ -5070,7 +5070,7 @@ label.error {
       border-radius: 5px;
       margin-left: 10px;
       position: relative;
-      width: fit-content; }
+      }
       .messages-wrapper .messages-body .message-in .message-body .message-content:before,
       .conversations-body .message-in .message-body .message-content:before {
         width: 0;
@@ -5119,7 +5119,7 @@ label.error {
       border-radius: 5px;
       margin-right: 10px;
       position: relative;
-      width: fit-content; }
+       }
       .messages-wrapper .messages-body .message-out .message-body .message-content:before,
       .conversations-body .message-out .message-body .message-content:before {
         width: 0;
