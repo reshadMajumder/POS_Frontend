@@ -18,8 +18,6 @@ function Sale() {
     const [discount, setDiscount] = useState(0);
     const [totalPaid, setTotalPaid] = useState(0);
     const [selectedBank, setSelectedBank] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('');
-
     useEffect(() => {
         const savedProducts = JSON.parse(localStorage.getItem('selectedProducts')) || [];
         setSelectedProducts(savedProducts);
@@ -30,6 +28,7 @@ function Sale() {
     }, [selectedProducts]);
 
     useEffect(() => {
+        
         if (query) {
             searchProductsStock(query)
                 .then((response) => {
@@ -101,15 +100,18 @@ function Sale() {
             total_cost: Number(totalCost.toFixed(2)),
             total_profit_or_loss: Number(totalProfitOrLoss.toFixed(2)),
             total_Bill:total_bill,
+            vat_rate:vat,
             items: selectedProducts.map(product => ({
                 product: product.id,
                 quantity: product.quantity,
-                selling_price_per_unit: product.selling_price_per_unit
+                selling_price_per_unit: product.selling_price_per_unit,
+                supplier_price_per_unit: product.supplier_price_per_unit
             })),
             created_at: new Date().toISOString().split('T')[0],
             total_paid: totalPaid,
             total_due: Math.floor(total_bill - discount - totalPaid),
             payment_method: selectedBank
+
         };
     
         createBill(billData)
@@ -121,7 +123,7 @@ function Sale() {
                 setVat(15);
                 setTotalPaid(0);
                 
-                setPaymentMethod('');
+                selectedBank('');
                 
                 localStorage.removeItem('selectedProducts');
                 console.log('Products in the sale table after bill creation: []');

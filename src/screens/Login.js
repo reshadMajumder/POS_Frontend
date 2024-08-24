@@ -12,7 +12,11 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+<<<<<<< Updated upstream
             const response = await axios.post('https://point-of-sale-sable.vercel.app/api/login/', {
+=======
+            const response = await axios.post('https://reshad97.pythonanywhere.com/api/login/', {
+>>>>>>> Stashed changes
                 username,
                 password
             });
