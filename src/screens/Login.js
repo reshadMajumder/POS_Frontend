@@ -12,7 +12,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/login/', {
+const response = await axios.post('https://reshad97.pythonanywhere.com/api/login/', {
                 username,
                 password
             });
