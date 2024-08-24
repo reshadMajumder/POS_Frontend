@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://point-of-sale-sable.vercel.app/api/';
+// const API_URL = 'http://127.0.0.1:8000/api/';
+const API_URL = 'http://127.0.0.1:8000/api/';
 
 export const fetchSuppliers = () => axios.get(`${API_URL}suppliers/`);
 export const createSupplier = (data) => axios.post(`${API_URL}suppliers/`, data);
@@ -25,6 +26,19 @@ export const fetchStocks = () => {
 export const createBill = (billData) => {
     return axios.post(`${API_URL}bills/`, billData);
 };
+
+
+export const searchBills = (query) => {
+    return axios.get(`${API_URL}search_bills/?query=${query}`);
+};
+
+export const updateBill = (id, data) => {
+    return axios.put(`${API_URL}bills/${id}/update/`, data);
+}
+
+
+
+
 
 export const searchProducts = (query) => {
     return axios.get(`${API_URL}search-products/?search=${query}`);
