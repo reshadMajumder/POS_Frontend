@@ -1,11 +1,6 @@
 import axios from 'axios';
 
-<<<<<<< Updated upstream
-const API_URL = 'https://point-of-sale-sable.vercel.app/api/';
-=======
-// const API_URL = 'http://127.0.0.1:8000/api/';
 const API_URL = 'https://reshad97.pythonanywhere.com/api/';
->>>>>>> Stashed changes
 
 export const fetchSuppliers = () => axios.get(`${API_URL}suppliers/`);
 export const createSupplier = (data) => axios.post(`${API_URL}suppliers/`, data);
